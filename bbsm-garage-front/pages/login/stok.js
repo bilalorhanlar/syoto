@@ -43,7 +43,7 @@ export default function stok() {
     const fetchStokListesi = async () => {
       setLoading(true);
       try {
-          const response = await fetchWithAuth("http://13.51.175.13:4000/stok", {
+          const response = await fetchWithAuth("https://16.171.130.205:4000/stok", {
               method: 'GET',
           });
           if (!response.ok) {
@@ -75,7 +75,7 @@ export default function stok() {
           };
 
           try {
-              const response = await fetchWithAuth('http://13.51.175.13:4000/stok', {
+              const response = await fetchWithAuth('https://16.171.130.205:4000/stok', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export default function stok() {
       try {
         // Seçilen her bir stok ID'si için ayrı bir DELETE isteği gönder
         const deleteRequests = selectedStok.map(id =>
-          fetchWithAuth(`http://13.51.175.13:4000/stok/${id}`, { method: 'DELETE' })
+          fetchWithAuth(`https://16.171.130.205:4000/stok/${id}`, { method: 'DELETE' })
         );
         await Promise.all(deleteRequests);
     

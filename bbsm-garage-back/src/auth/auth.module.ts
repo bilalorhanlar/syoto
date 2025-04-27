@@ -6,17 +6,22 @@ import { AuthEntity } from './auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forFeature([AuthEntity]),
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET, // Çevresel değişkeni kullan
-      signOptions: { expiresIn: '3m' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '60m' },
+      }),
     }),
   ],
   providers: [AuthService, JwtStrategy],

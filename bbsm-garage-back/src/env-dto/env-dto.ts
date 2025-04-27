@@ -7,7 +7,7 @@ export class EnvDto {
     private readonly DEFAULT_DB_USER = "newuser";
     private readonly DEFAULT_DB_PASS = "12345678";
     private readonly DEFAULT_DB_NAME = "newdb";
-    private readonly DEFAULT_JWT_SECRET = "your-secret-key-here";
+    private readonly DEFAULT_JWT_SECRET = "1234567890";
     private readonly DEFAULT_DB_SSL = true;
 
     public DB_HOST: string;
