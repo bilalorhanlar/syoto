@@ -6,7 +6,7 @@ const Loading = () => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="logo-spinner">
-        <Image src={bmwLogo} alt="Loading" width={250} height={250} style={{ width: '200px', height: 'auto' }} />
+        <Image src={bmwLogo} alt="Loading" width={250} height={250} style={{ width: '200px', height: 'auto' }} priority />
       </div>
     </div>
   );

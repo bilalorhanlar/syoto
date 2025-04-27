@@ -356,8 +356,8 @@ export default function Detay() {
                   </svg>
                 </button>
                 <a href="#" className="flex ml-2 md:mr-8 lg:mr-24">
-                  <img src="/images/BBSMlogo.webp" className="h-8 mr-3" alt="logo" />
-                  <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-my-siyah">BBSM GARAGE</span>
+                  <img src="/images/BBSMlogo.png" className="h-16 mr-3" alt="logo" />
+
                 </a>
               </div>
               <div className="flex items-center">

@@ -184,8 +184,8 @@ export default function stok() {
                 <div className="flex items-center">
                   <button onClick={toggleMenu} className={`lg:hidden p-3 font-bold text-lg leading-tight antialiased ${isOpen && 'hidden'}`}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                   <a href="#" className="flex ml-2 md:mr-8 lg:mr-24">
-                  <img src="/images/BBSMlogo.webp" className="h-8 mr-3" alt="logo" />
-                  <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-my-siyah">BBSM GARAGE</span>
+                  <img src="/images/BBSMlogo.png" className="h-16 mr-3" alt="logo" />
+                  
                   </a>
                 </div>
                 <div className="flex items-center">
