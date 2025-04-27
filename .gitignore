@@ -1,0 +1,11 @@
+# Node.js ve Next.js için güvenli .gitignore
+node_modules/
+.next/
+.env
+dist/
+build/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
