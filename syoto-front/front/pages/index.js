@@ -21,7 +21,12 @@ export default function Home() {
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-white px-4">
-        <h1 className="flex text-5xl md:text-7xl font-bold mb-6 text-center tracking-tight">S<p className=" text-3xl items-end pl-1 -pr-1 translate-y-5"> & </p>Y OTOMOTİV<p className="text-xl items-end pl-1 -pr-1 translate-y-8">MASLAK</p></h1>
+        <h1 className="text-4xl md:text-7xl font-bold mb-6 text-center tracking-tight leading-tight">
+          S
+          <span className="text-xl md:text-3xl align-baseline px-1">&</span>
+          Y OTOMOTİV
+          <span className="block md:inline text-lg md:text-xl align-baseline px-1">MASLAK</span>
+        </h1>
         <p className="text-2xl md:text-3xl mb-10 text-center font-light tracking-wide">Maslak'ın En Güvenilir Servisi</p>
         <Link 
           href="/bizeulasin" 

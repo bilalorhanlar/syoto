@@ -7,7 +7,7 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// SSL sertifika yapılandırması
+ //SSL sertifika yapılandırması
 const httpsOptions = {
   key: fs.readFileSync('/home/ubuntu/bbsm-garage/front/domain.key'),
   cert: fs.readFileSync('/home/ubuntu/bbsm-garage/front/wwwsyotomotivcom.crt'),

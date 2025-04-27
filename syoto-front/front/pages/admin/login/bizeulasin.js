@@ -82,7 +82,7 @@ function BizeUlasin() {
                 </div>
                 <div className="w-full">
                   <p className="text-my-siyah font-bold mb-4">Telefon Numarası</p>
-                  <p className="text-my-beyaz shadow-lg bg-gradient-to-r from-green-900 to-lime-600 p-2 text-center font-bold rounded-full">+90 553 323 1993</p>
+                  <p className="text-my-beyaz shadow-lg bg-gradient-to-r from-green-900 to-lime-600 p-2 text-center font-bold rounded-full">+90 535 231 17 26</p>
                 </div>
               </div>
             </div>

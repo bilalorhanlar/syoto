@@ -32,7 +32,7 @@ export default function cozumler() {
                             Randevu Al
                         </Link>
                         <Link 
-                            href="tel:+902122222222" 
+                            href="tel:+905352311726" 
                             className="bg-white/10 text-white font-bold py-3 px-8 rounded-full hover:bg-white/20 transition duration-300 transform hover:scale-105"
                         >
                             Hemen Ara

@@ -59,7 +59,7 @@ export default function bizeulasin() {
         <Header />
         <Head>
             <title>S&Y Otomotiv - Bize Ulaşın</title>
-            <link rel="icon" href="/favicon.ico" />
+            <link rel="icon" href="/syoto.ico" />
         </Head>
         <Script
             src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
@@ -81,7 +81,7 @@ export default function bizeulasin() {
                     </p>
                     <div className="mt-12 flex gap-4 justify-center">
                         <Link 
-                            href="tel:+905XXXXXXXXX" 
+                            href="tel:+905352311726" 
                             className="bg-red-600 text-white font-bold py-3 px-8 rounded-full hover:bg-red-700 transition duration-300 transform hover:scale-105"
                         >
                             Hemen Ara
@@ -224,7 +224,7 @@ export default function bizeulasin() {
                                 </svg>
                                 <div>
                                     <h3 className="font-semibold">Telefon</h3>
-                                    <a href="tel:+905XXXXXXXXX" className="text-gray-600 hover:text-red-600">+90 535 231 1726</a>
+                                    <a href="tel:+905352311726" className="text-gray-600 hover:text-red-600">+90 535 231 1726</a>
                                 </div>
                             </div>
                             <div className="flex items-start">

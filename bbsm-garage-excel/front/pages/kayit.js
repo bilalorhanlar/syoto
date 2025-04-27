@@ -15,7 +15,7 @@ export default function Home() {
           <div className="text-center w-full">
             <p className="w-full text-2xl p-1 font-thin mb-4 rounded-xl text-my-beyaz bg-my-4b4b4bgri border border-my-açıkgri">https://www.bbsmgarage.com</p>
             <p className="w-full text-2xl p-1 font-thin mb-4 rounded-xl text-my-beyaz bg-my-4b4b4bgri border border-my-açıkgri">info@BBSM.GARAGE</p>
-            <p className="w-full text-2xl p-1 font-thin mb-4 rounded-xl text-my-beyaz bg-my-4b4b4bgri border border-my-açıkgri">+90 553 323 1993</p>
+            <p className="w-full text-2xl p-1 font-thin mb-4 rounded-xl text-my-beyaz bg-my-4b4b4bgri border border-my-açıkgri">+90 535 231 17 2</p>
           </div>
           <Link href="/" className="w-1/2 text-center p-2 ml-2 font-semibold rounded-xl border-2 border-my-4b4b4bgri bg-my-siyah text-my-beyaz transition duration-500 ease-in-out hover:bg-my-4b4b4bgri"><p className="font-extrabold text-transparent text-lg bg-clip-text bg-gradient-to-r from-blue-400 to-blue-900">Geri Dön</p></Link>
         </div>
