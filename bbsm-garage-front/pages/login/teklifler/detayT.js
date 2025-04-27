@@ -71,7 +71,7 @@ export default function Detay() {
   async function fetchData(teklif_id) {
     setLoading(true);
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205:4000/teklif/${teklif_id}`, {
+      const response = await fetchWithAuth(`https://16.171.130.205/teklif/${teklif_id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function Detay() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205:4000/yapilanlar/${id}`, {
+      const response = await fetchWithAuth(`https://16.171.130.205/yapilanlar/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ export default function Detay() {
     };
   
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205:4000/teklif/${detay_id}`, {
+      const response = await fetchWithAuth(`https://16.171.130.205/teklif/${detay_id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export default function Detay() {
     }));
   
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205:4000/teklif/${detay_id}/yapilanlar`, {
+      const response = await fetchWithAuth(`https://16.171.130.205/teklif/${detay_id}/yapilanlar`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -49,7 +49,7 @@ const Kartlar = () => {
     }
     try {
       const deleteRequests = secilenKartlar.map(kartId =>
-        fetch(`https://16.171.130.205:4000/card/${kartId}`, { method: 'DELETE' })
+        fetch(`https://16.171.130.205/card/${kartId}`, { method: 'DELETE' })
       );
       await Promise.all(deleteRequests);
 
@@ -73,7 +73,7 @@ const Kartlar = () => {
   const fetchTeklifListesi = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://16.171.130.205:4000/teklif", { method: 'GET' });
+      const response = await fetch("https://16.171.130.205/teklif", { method: 'GET' });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -88,7 +88,7 @@ const Kartlar = () => {
   const fetchKartListesi = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://16.171.130.205:4000/card", { method: 'GET' });
+      const response = await fetch("https://16.171.130.205/card", { method: 'GET' });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -112,7 +112,7 @@ const Kartlar = () => {
   const handleKartEkle = async (yeniKart) => {
     setLoading(true);
     try {
-      const response = await fetch('https://16.171.130.205:4000/card', {
+      const response = await fetch('https://16.171.130.205/card', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const Kartlar = () => {
 
     try {
       // Teklifi teklif tablosuna ekle
-      const response = await fetch('https://16.171.130.205:4000/teklif', {
+      const response = await fetch('https://16.171.130.205/teklif', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
