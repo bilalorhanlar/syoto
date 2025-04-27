@@ -287,11 +287,10 @@ const secilenTeklifleriIndir = async () => {
                 </button>
                 <a href="#" className="flex ml-2 md:mr-8 lg:mr-24">
                   <img src="/images/BBSMlogo.png" className="h-16 mr-3" alt="logo" />
-                  
                 </a>
               </div>
               <div className="flex items-center">
-                <button type="button" className="flex items-center text-sm">
+                <button type="button" className="flex items-center text-sm hidden md:flex">
                   <span className="sr-only">Open user menu</span>
                   <p className="text-center text-my-siyah font-semibold items-center pr-8">Yasin Ufuk ORHANLAR</p>
                   <img src="/images/yasin.webp" className="h-16 w-16 rounded-full" alt="Yasin Bey" />
@@ -301,7 +300,66 @@ const secilenTeklifleriIndir = async () => {
           </div>
         </nav>
 
-        <div className="p-6 pt-8 lg:ml-64">
+        {/* MOBILE LAYOUT */}
+        <div className="md:hidden bg-white min-h-screen pt-24 px-2">
+          {/* Search bar at the top */}
+          <div className="w-full mb-2">
+            <input
+              type="text"
+              id="table-search-mobile"
+              className="block w-full p-2 text-md text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Teklifleri ara"
+              value={aramaTerimi}
+              onChange={(e) => setAramaTerimi(e.target.value)}
+            />
+          </div>
+          {/* Action buttons stacked */}
+          <div className="flex flex-col gap-2 w-full mb-4">
+            <button onClick={silSecilenleri} className="w-full bg-red-600 text-white font-semibold py-2 rounded-full">Seçilenleri Sil</button>
+            <button onClick={secilenTeklifleriIndir} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri İndir</button>
+          </div>
+          {/* Teklif list as cards */}
+          <div className="w-full">
+            {filtrelenmisTeklifler.map((teklif) => (
+              <div key={teklif.teklif_id} className="w-full border-b last:border-b-0 px-2 py-2 flex items-center">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mr-2"
+                  checked={secilenTeklifler.includes(teklif.teklif_id)}
+                  onChange={(e) => handleCheckboxChange(e, teklif.teklif_id)}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-gray-900 text-sm truncate">{capitalizeWords(teklif.adSoyad || "Tanımsız")}</div>
+                  <div className="text-xs text-gray-600 truncate">{capitalizeWords(teklif.markaModel || "Tanımsız")}</div>
+                  <div className="text-xs text-green-600 font-semibold">{toUpperCase(teklif.plaka || "Tanımsız")}</div>
+                  <div className="text-xs text-gray-600">{teklif.km !== undefined && teklif.km !== null ? formatKm(teklif.km) : "Tanımsız"} km</div>
+                  <div className="text-xs text-blue-500">{teklif.girisTarihi || "Tanımsız"}</div>
+                </div>
+                <div className="flex flex-col items-center ml-2 gap-2">
+                  <button onClick={() => handleTeklifEkle(teklif)} className="text-blue-500 hover:text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                  <a href={DetailPage(teklif.teklif_id)} className="text-yellow-500 hover:text-yellow-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </a>
+                  <button onClick={() => handleExcelDownload(teklif.teklif_id)} className="text-green-500 hover:text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* DESKTOP TABLE (unchanged) */}
+        <div className="hidden md:block p-6 pt-8 lg:ml-64">
           <div className="p-6 mt-20 bg-my-beyaz rounded-3xl">
             <div className="flex items-center pb-4 justify-between">
               <div className="flex items-center">

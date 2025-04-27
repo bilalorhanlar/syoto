@@ -376,7 +376,7 @@ const secilenKartlariIndir = async () => {
                 </a>
               </div>
               <div className="flex items-center">
-                <button type="button" className="flex items-center text-sm">
+                <button type="button" className="flex items-center text-sm hidden md:flex">
                   <span className="sr-only">Open user menu</span>
                   <p className="text-center text-my-siyah font-semibold items-center pr-8">Yasin Ufuk ORHANLAR</p>
                   <img src="/images/yasin.webp" className="h-16 w-16 rounded-full" alt="Yasin Bey" />
@@ -397,25 +397,20 @@ const secilenKartlariIndir = async () => {
                 </div>
               </div>
 
+              {/* Desktop action buttons and search bar - only show on md and up */}
               <div className="flex items-center">
-                <div className="items-center bg-red-600 p-2 pl-4 pr-4 rounded-full ml-4">
-                  <button onClick={silSecilenleri} className="font-semibold text-my-beyaz text-md">Seçilenleri Sil</button>
-                </div>
-                <div className="items-center bg-green-500 p-2 pl-4 pr-4 rounded-full ml-4">
-                  <button onClick={secilenKartlariIndir} className="font-semibold text-my-beyaz text-md">Seçilenleri İndir</button>
-                </div>
-
-                <div className="items-center bg-my-mavi p-2 pl-4 pr-4 rounded-full ml-4" onClick={toggleYeniKartEkleModal}>
-                  <button className="font-semibold text-my-beyaz text-md">Yeni Kart Ekle</button>
-                </div>
-                {isYeniKartEkleModalOpen && (
-                  <div className="fixed inset-0 bg-gray-300 bg-opacity-50 z-40" onClick={toggleYeniKartEkleModal}>
-                    <div className="fixed top-1/2 left-1/2 p-6 rounded-md z-50" onClick={e => e.stopPropagation()}>
-                      <AnaBilesen onClose={toggleYeniKartEkleModal} onKartEkle={handleKartEkle} onTeklifEkle={handleTeklifEkle} />
-                    </div>
+                <div className="hidden md:flex items-center">
+                  <div className="items-center bg-red-600 p-2 pl-4 pr-4 rounded-full ml-4">
+                    <button onClick={silSecilenleri} className="font-semibold text-my-beyaz text-md">Seçilenleri Sil</button>
                   </div>
-                )}
-                <div className="pr-4 items-center pl-4">
+                  <div className="items-center bg-green-500 p-2 pl-4 pr-4 rounded-full ml-4">
+                    <button onClick={secilenKartlariIndir} className="font-semibold text-my-beyaz text-md">Seçilenleri İndir</button>
+                  </div>
+                </div>
+                <div className="items-center bg-my-mavi p-2 pl-4 pr-4 rounded-full ml-4">
+                  <button onClick={toggleYeniKartEkleModal} className="font-semibold text-my-beyaz text-md">Yeni Kart Ekle</button>
+                </div>
+                <div className="hidden md:block pr-4 items-center pl-4">
                   <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between">
                     <label htmlFor="table-search" className="sr-only">Search</label>
                     <div className="relative">
@@ -435,90 +430,167 @@ const secilenKartlariIndir = async () => {
               </div>
             </div>
 
-            <div className="overflow-auto ">
-              <table className="w-full text-sm text-left text-gray-500 font-medium">
-              <thead className="text-xs text-gray-600 uppercase bg-my-edbeyaz">
-                <tr>
-                  <th scope="col" className="p-4"></th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('adSoyad')}>
-                    Ad-Soyad {sortConfig.key === 'adSoyad' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('markaModel')}>
-                    Marka-Model {sortConfig.key === 'markaModel' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('plaka')}>
-                    Plaka {sortConfig.key === 'plaka' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('km')}>
-                    Km {sortConfig.key === 'km' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('sasi')}>
-                    Şasİ No {sortConfig.key === 'sasi' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('girisTarihi')}>
-                    Giriş Tarihi {sortConfig.key === 'girisTarihi' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Görüntüle
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    İndİr
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {sortedKartlar.filter(kart =>
-                  kart.adSoyad?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
-                  kart.markaModel?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
-                  kart.plaka?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
-                  kart.sasi?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
-                  kart.km?.toString().includes(aramaTerimi) ||
-                  kart.girisTarihi?.toString().includes(aramaTerimi)
-                ).map((kart) => (
-                  <tr key={kart.card_id}>
-                    <td className="w-4 p-4">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                          checked={secilenKartlar.includes(kart.card_id)}
-                          onChange={(e) => handleCheckboxChange(e, kart.card_id)}
-                        />
-                        <label htmlFor={`checkbox-table-${kart.card_id}`} className="sr-only">checkbox</label>
+            <div className="overflow-auto">
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <table className="w-full text-sm text-left text-gray-500 font-medium">
+                  <thead className="text-xs text-gray-600 uppercase bg-my-edbeyaz">
+                    <tr>
+                      <th scope="col" className="p-4"></th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('adSoyad')}>
+                        Ad-Soyad {sortConfig.key === 'adSoyad' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('markaModel')}>
+                        Marka-Model {sortConfig.key === 'markaModel' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('plaka')}>
+                        Plaka {sortConfig.key === 'plaka' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('km')}>
+                        Km {sortConfig.key === 'km' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('sasi')}>
+                        Şasİ No {sortConfig.key === 'sasi' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 cursor-pointer" onClick={() => handleSort('girisTarihi')}>
+                        Giriş Tarihi {sortConfig.key === 'girisTarihi' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        Görüntüle
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        İndİr
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {sortedKartlar.filter(kart =>
+                      kart.adSoyad?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                      kart.markaModel?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                      kart.plaka?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                      kart.sasi?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                      kart.km?.toString().includes(aramaTerimi) ||
+                      kart.girisTarihi?.toString().includes(aramaTerimi)
+                    ).map((kart) => (
+                      <tr key={kart.card_id}>
+                        <td className="w-4 p-4">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                              checked={secilenKartlar.includes(kart.card_id)}
+                              onChange={(e) => handleCheckboxChange(e, kart.card_id)}
+                            />
+                            <label htmlFor={`checkbox-table-${kart.card_id}`} className="sr-only">checkbox</label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                          {capitalizeWords(kart.adSoyad || "Tanımsız")}
+                        </td>
+                        <td className="px-6 py-4">
+                          {capitalizeWords(kart.markaModel || "Tanımsız")}
+                        </td>
+                        <td className="px-6 py-4 text-green-500">
+                          {toUpperCase(kart.plaka || "Tanımsız")}
+                        </td>
+                        <td className="px-6 py-4">
+                          {kart.km !== undefined && kart.km !== null ? formatKm(kart.km) : "Tanımsız"}
+                        </td>
+                        <td className="px-6 py-4 uppercase">
+                          {(kart.sasi || "Tanımsız").length > 17  ? `${toUpperCase((kart.sasi || "Tanımsız").substring(0, 17))}...` : toUpperCase(kart.sasi || "Tanımsız")}
+                        </td>
+                        <td className="px-6 py-4 text-blue-500">
+                          {kart.girisTarihi || "Tanımsız"}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link href={DetailPage(kart.card_id)} className="bg-yellow-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-siyah hover:underline">Detay</Link>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button onClick={() => handleExcelDownload(kart.card_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">Excel</button>  
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MOBILE LAYOUT */}
+              <div className="md:hidden">
+                {/* Search bar at the top */}
+                <div className="w-full mb-2">
+                  <input
+                    type="text"
+                    id="table-search-mobile"
+                    className="block w-full p-2 text-md text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Kartları ara"
+                    value={aramaTerimi}
+                    onChange={(e) => setAramaTerimi(e.target.value)}
+                  />
+                </div>
+                {/* Action buttons stacked */}
+                <div className="flex flex-col gap-2 w-full mb-4">
+                  <button onClick={silSecilenleri} className="w-full bg-red-600 text-white font-semibold py-2 rounded-full">Seçilenleri Sil</button>
+                  <button onClick={secilenKartlariIndir} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri İndir</button>
+                  <button onClick={toggleYeniKartEkleModal} className="w-full bg-my-mavi text-white font-semibold py-2 rounded-full">Yeni Kart Ekle</button>
+                </div>
+                {/* Card list, full width, white bg, compact */}
+                <div className="w-full bg-white">
+                  {sortedKartlar.filter(kart =>
+                    kart.adSoyad?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                    kart.markaModel?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                    kart.plaka?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                    kart.sasi?.toLowerCase().includes(aramaTerimi.toLowerCase()) ||
+                    kart.km?.toString().includes(aramaTerimi) ||
+                    kart.girisTarihi?.toString().includes(aramaTerimi)
+                  ).map((kart) => (
+                    <div key={kart.card_id} className="w-full border-b last:border-b-0 px-2 py-2 flex items-center">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mr-2"
+                        checked={secilenKartlar.includes(kart.card_id)}
+                        onChange={(e) => handleCheckboxChange(e, kart.card_id)}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 text-sm truncate">{capitalizeWords(kart.adSoyad || "Tanımsız")}</div>
+                        <div className="text-xs text-gray-600 truncate">{capitalizeWords(kart.markaModel || "Tanımsız")}</div>
+                        <div className="text-xs text-green-600 font-semibold">{toUpperCase(kart.plaka || "Tanımsız")}</div>
+                        <div className="text-xs text-gray-600">{kart.km !== undefined && kart.km !== null ? formatKm(kart.km) : "Tanımsız"} km</div>
+                        <div className="text-xs text-blue-500">{kart.girisTarihi || "Tanımsız"}</div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {capitalizeWords(kart.adSoyad || "Tanımsız")}
-                    </td>
-                    <td className="px-6 py-4">
-                      {capitalizeWords(kart.markaModel || "Tanımsız")}
-                    </td>
-                    <td className="px-6 py-4 text-green-500">
-                      {toUpperCase(kart.plaka || "Tanımsız")}
-                    </td>
-                    <td className="px-6 py-4">
-                      {kart.km !== undefined && kart.km !== null ? formatKm(kart.km) : "Tanımsız"}
-                    </td>
-                    <td className="px-6 py-4 uppercase">
-                      {(kart.sasi || "Tanımsız").length > 17  ? `${toUpperCase((kart.sasi || "Tanımsız").substring(0, 17))}...` : toUpperCase(kart.sasi || "Tanımsız")}
-                    </td>
-                    <td className="px-6 py-4 text-blue-500">
-                      {kart.girisTarihi || "Tanımsız"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Link href={DetailPage(kart.card_id)} className="bg-yellow-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-siyah hover:underline">Detay</Link>
-                    </td>
-                    <td className="px-6 py-4 ">
-                      <button onClick={() => handleExcelDownload(kart.card_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">Excel</button>  
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              </table>
+                      <div className="flex flex-col items-center ml-2 gap-2">
+                        <Link href={DetailPage(kart.card_id)} className="text-yellow-500 hover:text-yellow-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </Link>
+                        <button onClick={() => handleExcelDownload(kart.card_id)} className="text-green-500 hover:text-green-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal - moved outside the main content div */}
+      {isYeniKartEkleModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+          <div className="relative">
+            <AnaBilesen 
+              onClose={() => setIsYeniKartEkleModalOpen(false)} 
+              onKartEkle={handleKartEkle} 
+              onTeklifEkle={handleTeklifEkle} 
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };
