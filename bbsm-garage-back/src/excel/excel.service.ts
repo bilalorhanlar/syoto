@@ -10,15 +10,12 @@ export class ExcelService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async generateExcel(data: any): Promise<{ excelBuffer: Buffer, pdfBuffer: Buffer }> {
+  async generateExcel(data: any): Promise<Buffer> {
     try {
-      this.logger.log('Generating Excel file with data:', JSON.stringify(data));
-
       const httpsAgent = new https.Agent({
-        rejectUnauthorized: false // Allow self-signed certificates
+        rejectUnauthorized: false
       });
 
-      // Excel indirme isteği
       const excelResponse: AxiosResponse<ArrayBuffer> = await firstValueFrom(
         this.httpService.post('https://13.61.75.15/api/excel/download', data, {
           responseType: 'arraybuffer',
@@ -29,7 +26,23 @@ export class ExcelService {
         })
       );
 
-      // PDF indirme isteği
+      if (!excelResponse.data) {
+        throw new Error('No data received from Excel service');
+      }
+
+      return Buffer.from(excelResponse.data);
+    } catch (error) {
+      this.logger.error('Error generating Excel:', error);
+      throw new Error(`Failed to generate Excel: ${error.message}`);
+    }
+  }
+
+  async generatePDF(data: any): Promise<Buffer> {
+    try {
+      const httpsAgent = new https.Agent({
+        rejectUnauthorized: false
+      });
+
       const pdfResponse: AxiosResponse<ArrayBuffer> = await firstValueFrom(
         this.httpService.post('https://13.61.75.15/api/pdf/download', data, {
           responseType: 'arraybuffer',
@@ -40,23 +53,14 @@ export class ExcelService {
         })
       );
 
-      if (!excelResponse.data || !pdfResponse.data) {
-        throw new Error('No data received from services');
+      if (!pdfResponse.data) {
+        throw new Error('No data received from PDF service');
       }
 
-      this.logger.log('Excel and PDF files generated successfully');
-      return {
-        excelBuffer: Buffer.from(excelResponse.data),
-        pdfBuffer: Buffer.from(pdfResponse.data)
-      };
+      return Buffer.from(pdfResponse.data);
     } catch (error) {
-      this.logger.error('Error generating files:', error);
-      this.logger.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-      throw new Error(`Failed to generate files: ${error.message}`);
+      this.logger.error('Error generating PDF:', error);
+      throw new Error(`Failed to generate PDF: ${error.message}`);
     }
   }
 } 

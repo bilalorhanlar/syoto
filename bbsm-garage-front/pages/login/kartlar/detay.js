@@ -316,6 +316,59 @@ export default function Detay() {
     setLoading(false);
 };
 
+const handlePDFDownload = async () => {
+  setLoading(true);
+  const dataToSend = {
+      vehicleInfo: {
+          adSoyad,
+          telNo,
+          markaModel,
+          plaka,
+          km,
+          modelYili,
+          sasi,
+          renk,
+          girisTarihi,
+          notlar,
+          adres,
+      },
+      data: yapilanlar.map(item => ({
+          birimAdedi: item.birimAdedi,
+          parcaAdi: item.parcaAdi,
+          birimFiyati: item.birimFiyati,
+          toplamFiyat: item.birimFiyati * item.birimAdedi,
+      })),
+      notes: notlar
+  };
+
+  try {
+      const response = await fetch('https://13.61.75.15/api/pdf/download', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'output.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+  } catch (error) {
+      console.error('PDF download error:', error);
+  }
+  setLoading(false);
+};
+
   return (
     <>
       <Head>
@@ -375,96 +428,101 @@ export default function Detay() {
 
       <div className="p-6 pt-8 mt-14 lg:ml-64">
         <div className="p-6 mt-5 bg-my-beyaz rounded-3xl">
-          <div className="flex p-2 items-center justify-between">
+          <div className="flex p-2 items-center justify-between flex-col sm:flex-row gap-4 sm:gap-0">
             <h2 className="text-2xl font-bold text-my-siyah mb-4">Kart Bilgileri</h2>
-            <div className="flex items-center">
-              <div className="items-center bg-green-500 p-2 pl-8 pr-8 rounded-full ml-4">
+            <div className="flex items-center flex-wrap gap-2 sm:gap-0">
+              <div className="items-center bg-green-500 p-2 px-4 sm:px-8 rounded-full">
                 <button onClick={handleExcelDownload} className="font-semibold text-my-beyaz text-md">Excel</button>
               </div>
-              <div className="items-center bg-yellow-500 p-2 pl-8 pr-8 rounded-full ml-4">
+              <div className="items-center bg-orange-600 p-2 px-4 sm:px-8 rounded-full ml-2 sm:ml-4">
+                <button onClick={handlePDFDownload} className="font-semibold text-my-beyaz text-md">PDF</button>
+              </div>
+              <div className="items-center bg-yellow-500 p-2 px-4 sm:px-8 rounded-full ml-2 sm:ml-4">
                 <button onClick={handleSaveCardInfo} className="font-semibold text-my-beyaz text-md">Kaydet</button>
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-my-siyah">
-            <input onChange={handleChange} placeholder="Ad Soyad" value={adSoyad} type="text" id="adSoyad" className="bg-my-beyaz text-black border p-2 rounded-md " />
-            <input onChange={handleChange} placeholder="Telefon No" value={telNo} type="text" id="telNo" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Marka Model" value={markaModel} type="text" id="markaModel" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Plaka" value={plaka} type="text" id="plaka" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Km" value={km} type="text" id="km" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Model Yılı" value={modelYili} type="text" id="modelYili" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Şasi" value={sasi} type="text" id="sasi" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Renk" value={renk} type="text" id="renk" className="bg-my-beyaz border p-2 rounded-md" />
-            <input onChange={handleChange} placeholder="Giriş Tarihi" value={girisTarihi} type="text" id="girisTarihi" className="bg-my-beyaz border p-2 rounded-md " />
-            <textarea onChange={handleChange} placeholder="Adres" value={adres} id="adres" className="bg-my-beyaz border p-2 rounded-md" rows="1"></textarea>
-            <textarea onChange={handleChange} placeholder="Notlar" value={notlar} id="notlar" className="bg-my-beyaz border p-2 rounded-md col-span-2" rows="3"></textarea>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-my-siyah">
+            <input onChange={handleChange} placeholder="Ad Soyad" value={adSoyad} type="text" id="adSoyad" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Telefon No" value={telNo} type="text" id="telNo" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Marka Model" value={markaModel} type="text" id="markaModel" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Plaka" value={plaka} type="text" id="plaka" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Km" value={km} type="text" id="km" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Model Yılı" value={modelYili} type="text" id="modelYili" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Şasi" value={sasi} type="text" id="sasi" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Renk" value={renk} type="text" id="renk" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <input onChange={handleChange} placeholder="Giriş Tarihi" value={girisTarihi} type="text" id="girisTarihi" className="bg-my-beyaz border p-2 rounded-md w-full" />
+            <textarea onChange={handleChange} placeholder="Adres" value={adres} id="adres" className="bg-my-beyaz border p-2 rounded-md w-full" rows="1"></textarea>
+            <textarea onChange={handleChange} placeholder="Notlar" value={notlar} id="notlar" className="bg-my-beyaz border p-2 rounded-md w-full col-span-1 sm:col-span-2" rows="3"></textarea>
           </div>
-          <div className='flex justify-between  mb-8  mt-8'>
+          <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 mt-8'>
             <h2 className="text-2xl font-bold text-my-siyah">Yapılanlar</h2>
-            <div className="">
-              <button onClick={handleEkleYapilanlar} className="items-center  p-2 pl-8 pr-8 rounded-full ml-4 font-semibold bg-blue-500 text-my-beyaz text-md">Ekle</button>
-              <button onClick={handleSaveYapilanlar} className="items-center  p-2 pl-8 pr-8 rounded-full ml-4 font-semibold bg-yellow-500 text-my-beyaz text-md">Kaydet</button>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={handleEkleYapilanlar} className="p-2 px-4 sm:px-8 rounded-full font-semibold bg-blue-500 text-my-beyaz text-md">Ekle</button>
+              <button onClick={handleSaveYapilanlar} className="p-2 px-4 sm:px-8 rounded-full font-semibold bg-yellow-500 text-my-beyaz text-md">Kaydet</button>
             </div>
           </div>
-          <div className="overflow-x-auto mt-6">
-            <table className="min-w-full text-sm divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Birim Adedi</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Parça Adı</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Birim Fiyatı</th>
-                  <th className="px-6 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">Toplam Fiyat</th>
-                  <th className="px-6 py-3 text-center font-medium text-gray-700 uppercase tracking-wider">Sil</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {yapilanlar.map((yapilan, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        onChange={(event) => handleChange2(event, index)}
-                        placeholder="1" // Placeholder olarak açıklayıcı metin kullanın
-                        value={yapilan.birimAdedi || ''} // Yapilan.birimAdedi yoksa boş bir dize göster
-                        type="number"
-                        name="birimAdedi" // Güncellenecek alanın adını belirtin
-                        className="bg-my-beyaz border p-2 rounded-md"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        onChange={(event) => handleChange2(event, index)}
-                        placeholder="Parça Adı" // Placeholder olarak açıklayıcı metin kullanın
-                        value={yapilan.parcaAdi || ''} // Yapilan.parcaAdi yoksa boş bir dize göster
-                        type="text"
-                        name="parcaAdi" // Güncellenecek alanın adını belirtin
-                        className="bg-my-beyaz border p-2 rounded-md w-full truncate"
-                        title={yapilan.parcaAdi || ''} // Tooltip ile tam metni göster
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        onChange={(event) => handleChange2(event, index)}
-                        placeholder="0" // Placeholder olarak açıklayıcı metin kullanın
-                        value={yapilan.birimFiyati || ''} // Yapilan.birimFiyati yoksa boş bir dize göster
-                        type="number"
-                        name="birimFiyati" // Güncellenecek alanın adını belirtin
-                        className="bg-my-beyaz border p-2 rounded-md"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{(yapilan.birimFiyati) * (yapilan.birimAdedi)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <button onClick={() => handleDelete(yapilan.id)} className="text-red-500 hover:text-red-700">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                      </button>
-                    </td>
+          <div className="overflow-x-auto -mx-6 sm:mx-0">
+            <div className="min-w-full inline-block align-middle">
+              <table className="min-w-full text-sm divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Birim Adedi</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-medium text-gray-600 uppercase tracking-wider">Parça Adı</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Birim Fiyatı</th>
+                    <th className="px-3 sm:px-6 py-3 text-left font-medium text-gray-700 uppercase tracking-wider">Toplam Fiyat</th>
+                    <th className="px-3 sm:px-6 py-3 text-center font-medium text-gray-700 uppercase tracking-wider">Sil</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <h2 className="text-xl text-end font-bold text-my-siyah p-8  m-4 mt-8">Toplam Fiyat : {toplamFiyat} </h2>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {yapilanlar.map((yapilan, index) => (
+                    <tr key={index}>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <input
+                          onChange={(event) => handleChange2(event, index)}
+                          placeholder="1"
+                          value={yapilan.birimAdedi || ''}
+                          type="number"
+                          name="birimAdedi"
+                          className="bg-my-beyaz border p-2 rounded-md w-full"
+                        />
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <input
+                          onChange={(event) => handleChange2(event, index)}
+                          placeholder="Parça Adı"
+                          value={yapilan.parcaAdi || ''}
+                          type="text"
+                          name="parcaAdi"
+                          className="bg-my-beyaz border p-2 rounded-md w-full truncate"
+                          title={yapilan.parcaAdi || ''}
+                        />
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <input
+                          onChange={(event) => handleChange2(event, index)}
+                          placeholder="0"
+                          value={yapilan.birimFiyati || ''}
+                          type="number"
+                          name="birimFiyati"
+                          className="bg-my-beyaz border p-2 rounded-md w-full"
+                        />
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">{(yapilan.birimFiyati) * (yapilan.birimAdedi)}</td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                        <button onClick={() => handleDelete(yapilan.id)} className="text-red-500 hover:text-red-700">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+          <h2 className="text-xl text-end font-bold text-my-siyah p-4 sm:p-8 m-4 mt-8">Toplam Fiyat : {toplamFiyat} </h2>
         </div>
       </div>
     </>

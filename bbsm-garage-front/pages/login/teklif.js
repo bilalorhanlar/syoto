@@ -140,9 +140,6 @@ export default function Teklif() {
     setLoading(false);
   };
 
-
-
-
   const filtrelenmisTeklifler = teklifler.filter(teklif => {
     const searchLower = aramaTerimi.toLowerCase();
     return (
@@ -153,7 +150,6 @@ export default function Teklif() {
       (teklif.girisTarihi?.toString().includes(aramaTerimi))
     );
   });
-
 
   const handleExcelDownload = async (teklifId) => {
     setLoading(true);
@@ -190,7 +186,7 @@ export default function Teklif() {
     };
 
     try {
-        const response = await fetch('https://13.61.75.15/api/excel/download', {
+        const response = await fetchWithAuth('https://16.171.130.205/excel/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -213,22 +209,73 @@ export default function Teklif() {
         window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Excel download error:', error);
-
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('Request data:', error.request);
-        } else {
-            console.error('Error message:', error.message);
-        }
-        console.error('Error config:', error.config);
     }
     setLoading(false);
 };
 
-const secilenTeklifleriIndir = async () => {
+const handlePDFDownload = async (teklifId) => {
+  setLoading(true);
+
+  const teklif = teklifler.find(t => t.teklif_id === teklifId);
+
+  if (!teklif) {
+      console.error("Seçilen teklif bulunamadı");
+      setLoading(false);
+      return;
+  }
+
+  const dataToSend = {
+      vehicleInfo: {
+          adSoyad: teklif.adSoyad,
+          telNo: teklif.telNo,
+          markaModel: teklif.markaModel,
+          plaka: teklif.plaka,
+          km: teklif.km,
+          modelYili: teklif.modelYili,
+          sasi: teklif.sasi,
+          renk: teklif.renk,
+          girisTarihi: teklif.girisTarihi,
+          notlar: teklif.notlar,
+          adres: teklif.adres,
+      },
+      data: teklif.yapilanlar.map(item => ({
+          birimAdedi: item.birimAdedi,
+          parcaAdi: item.parcaAdi,
+          birimFiyati: item.birimFiyati,
+          toplamFiyat: item.birimFiyati * item.birimAdedi,
+      })),
+      notes: teklif.notlar
+  };
+
+  try {
+      const response = await fetchWithAuth('https://16.171.130.205/excel/pdf', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'output.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+  } catch (error) {
+      console.error('PDF download error:', error);
+  }
+  setLoading(false);
+};
+
+const secilenTeklifleriIndir = async (type) => {
   setLoading(true);
 
   if (secilenTeklifler.length === 0) {
@@ -239,7 +286,11 @@ const secilenTeklifleriIndir = async () => {
 
   // Seçilen tüm teklifleri indir
   for (const teklifId of secilenTeklifler) {
-      await handleExcelDownload(teklifId);
+      if (type === 'excel') {
+          await handleExcelDownload(teklifId);
+      } else {
+          await handlePDFDownload(teklifId);
+      }
   }
 
   setLoading(false);
@@ -316,7 +367,8 @@ const secilenTeklifleriIndir = async () => {
           {/* Action buttons stacked */}
           <div className="flex flex-col gap-2 w-full mb-4">
             <button onClick={silSecilenleri} className="w-full bg-red-600 text-white font-semibold py-2 rounded-full">Seçilenleri Sil</button>
-            <button onClick={secilenTeklifleriIndir} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri İndir</button>
+            <button onClick={() => secilenTeklifleriIndir('excel')} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri Excel İndir</button>
+            <button onClick={() => secilenTeklifleriIndir('pdf')} className="w-full bg-orange-600 text-white font-semibold py-2 rounded-full">Seçilenleri PDF İndir</button>
           </div>
           {/* Teklif list as cards */}
           <div className="w-full">
@@ -347,11 +399,18 @@ const secilenTeklifleriIndir = async () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </a>
-                  <button onClick={() => handleExcelDownload(teklif.teklif_id)} className="text-green-500 hover:text-green-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleExcelDownload(teklif.teklif_id)} className="text-green-500 hover:text-green-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </button>
+                    <button onClick={() => handlePDFDownload(teklif.teklif_id)} className="text-orange-600 hover:text-orange-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -375,7 +434,10 @@ const secilenTeklifleriIndir = async () => {
                   <button onClick={silSecilenleri} className="font-semibold text-my-beyaz text-md">Seçilenleri Sil</button>
                 </div>
                 <div className="items-center bg-green-500 p-2 pl-4 pr-4 rounded-full ml-4">
-                  <button onClick={secilenTeklifleriIndir} className="font-semibold text-my-beyaz text-md">Seçilenleri İndir</button>
+                  <button onClick={() => secilenTeklifleriIndir('excel')} className="font-semibold text-my-beyaz text-md">Seçilenleri Excel İndir</button>
+                </div>
+                <div className="items-center bg-blue-500 p-2 pl-4 pr-4 rounded-full ml-4">
+                  <button onClick={() => secilenTeklifleriIndir('pdf')} className="font-semibold text-my-beyaz text-md">Seçilenleri PDF İndir</button>
                 </div>
 
                 <div className="pr-4 items-center pl-4">
@@ -421,7 +483,7 @@ const secilenTeklifleriIndir = async () => {
                     <th scope="col" className="px-6 py-3">
                       Giriş Tarihi
                     </th>
-                    <th scope="col" className=" px-4 py-3">
+                    <th scope="col" className="px-4 py-3">
                       Kartlara Ekle
                     </th>
                     <th scope="col" className="pl-5 px-4 py-3">
@@ -470,8 +532,17 @@ const secilenTeklifleriIndir = async () => {
                       <td className="px-6 py-2">
                         <a href={DetailPage(teklif.teklif_id)} className="bg-yellow-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-siyah hover:underline">Detay</a>
                       </td>
-                      <td className="px-6 py-2 ">
-                          <button onClick={() => handleExcelDownload(teklif.teklif_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">Excel</button>
+                      <td className="px-6 py-2 flex gap-2">
+                        <button onClick={() => handleExcelDownload(teklif.teklif_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </button>
+                        <button onClick={() => handlePDFDownload(teklif.teklif_id)} className="bg-blue-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))}

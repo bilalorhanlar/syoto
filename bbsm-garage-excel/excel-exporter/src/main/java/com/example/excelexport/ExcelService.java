@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,7 @@ public class ExcelService {
 
     private static final int MAX_ROWS_PER_SHEET = 24;
 
-    public ByteArrayInputStream exportExcel(Map<String, Object> vehicleInfo, List<Map<String, Object>> data, String notes) throws IOException {
+    public ByteArrayOutputStream exportExcel(Map<String, Object> vehicleInfo, List<Map<String, Object>> data, String notes) throws IOException {
         String templatePath = "/syoto.xlsx";  // Şablon dosyasının yolu
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -94,10 +93,7 @@ public class ExcelService {
             workbook.write(out);
             logger.info("Excel dosyası yazıldı.");
 
-            return new ByteArrayInputStream(out.toByteArray());
-        } finally {
-            out.close();
-            logger.info("ByteArrayOutputStream kapatıldı.");
+            return out;
         }
     }
 

@@ -1,26 +1,18 @@
 package com.example.excelexport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/excel")
+@RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class ExcelController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcelController.class);
 
     @Autowired
     private ExcelService excelService;
@@ -28,10 +20,14 @@ public class ExcelController {
     @Autowired
     private PDFService pdfService;
 
-    @PostMapping("/download")
+    @PostMapping("/excel/download")
     public ResponseEntity<byte[]> generateExcel(@RequestBody Map<String, Object> data) {
         try {
-            ByteArrayOutputStream outputStream = excelService.generateExcel(data);
+            ByteArrayOutputStream outputStream = excelService.exportExcel(
+                (Map<String, Object>) data.get("vehicleInfo"),
+                (java.util.List<Map<String, Object>>) data.get("data"),
+                (String) data.get("notes")
+            );
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
@@ -45,23 +41,24 @@ public class ExcelController {
         }
     }
 
-    @PostMapping("/download-pdf")
-    public ResponseEntity<InputStreamResource> downloadPDF(@RequestBody Map<String, Object> requestData) throws IOException {
-        logger.info("PDF indirme isteği alındı.");
-
-        Map<String, Object> vehicleInfo = (Map<String, Object>) requestData.get("vehicleInfo");
-        List<Map<String, Object>> data = (List<Map<String, Object>>) requestData.get("data");
-        String notes = (String) requestData.get("notes");
-
-        ByteArrayInputStream in = pdfService.exportPDF(vehicleInfo, data, notes);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=syoto.pdf");
-
-        logger.info("PDF dosyası indirme için hazırlandı.");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(in));
+    @PostMapping("/excel/pdf")
+    public ResponseEntity<byte[]> generatePDF(@RequestBody Map<String, Object> data) {
+        try {
+            ByteArrayOutputStream outputStream = pdfService.exportPDF(
+                (Map<String, Object>) data.get("vehicleInfo"),
+                (java.util.List<Map<String, Object>>) data.get("data"),
+                (String) data.get("notes")
+            );
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "output.pdf");
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(outputStream.toByteArray());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

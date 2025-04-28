@@ -3,16 +3,11 @@ package com.example.excelexport;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -20,10 +15,8 @@ import java.util.Map;
 
 @Service
 public class PDFService {
-    private static final Logger logger = LoggerFactory.getLogger(PDFService.class);
 
-    public ByteArrayInputStream exportPDF(Map<String, Object> vehicleInfo, List<Map<String, Object>> data, String notes) throws IOException {
-        logger.info("PDF oluşturma başladı");
+    public ByteArrayOutputStream exportPDF(Map<String, Object> vehicleInfo, List<Map<String, Object>> data, String notes) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(out));
@@ -31,15 +24,15 @@ public class PDFService {
             
             // Araç bilgileri
             document.add(new Paragraph("ARAÇ BİLGİLERİ").setBold().setTextAlignment(TextAlignment.CENTER));
-            document.add(new Paragraph("Plaka: " + vehicleInfo.get("plaka")));
-            document.add(new Paragraph("Ad Soyad: " + vehicleInfo.get("adSoyad")));
-            document.add(new Paragraph("Marka/Model: " + vehicleInfo.get("markaModel")));
-            document.add(new Paragraph("Adres: " + vehicleInfo.get("adres")));
-            document.add(new Paragraph("Renk: " + vehicleInfo.get("renk")));
-            document.add(new Paragraph("KM: " + vehicleInfo.get("km")));
-            document.add(new Paragraph("Şasi: " + vehicleInfo.get("sasi")));
-            document.add(new Paragraph("Telefon: " + vehicleInfo.get("telNo")));
-            document.add(new Paragraph("Giriş Tarihi: " + vehicleInfo.get("girisTarihi")));
+            document.add(new Paragraph("Plaka: " + toString(vehicleInfo.get("plaka"))));
+            document.add(new Paragraph("Ad Soyad: " + toString(vehicleInfo.get("adSoyad"))));
+            document.add(new Paragraph("Marka/Model: " + toString(vehicleInfo.get("markaModel"))));
+            document.add(new Paragraph("Adres: " + toString(vehicleInfo.get("adres"))));
+            document.add(new Paragraph("Renk: " + toString(vehicleInfo.get("renk"))));
+            document.add(new Paragraph("KM: " + toString(vehicleInfo.get("km"))));
+            document.add(new Paragraph("Şasi: " + toString(vehicleInfo.get("sasi"))));
+            document.add(new Paragraph("Telefon: " + toString(vehicleInfo.get("telNo"))));
+            document.add(new Paragraph("Giriş Tarihi: " + toString(vehicleInfo.get("girisTarihi"))));
             
             document.add(new Paragraph("\n"));
             
@@ -65,11 +58,9 @@ public class PDFService {
                 document.add(new Paragraph("\nNOTLAR:").setBold());
                 document.add(new Paragraph(notes));
             }
-            
-            logger.info("PDF oluşturma tamamlandı");
         }
         
-        return new ByteArrayInputStream(out.toByteArray());
+        return out;
     }
     
     private String toString(Object obj) {

@@ -294,13 +294,73 @@ const Kartlar = () => {
         window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Excel download error:', error);
-        console.error('Error message:', error.message);
     }
     setLoading(false);
 };
 
+const handlePDFDownload = async (kartId) => {
+  setLoading(true);
 
-const secilenKartlariIndir = async () => {
+  const kart = kartlar.find(k => k.card_id === kartId);
+
+  if (!kart) {
+      console.error("Seçilen kart bulunamadı");
+      setLoading(false);
+      return;
+  }
+
+  const dataToSend = {
+      vehicleInfo: {
+          adSoyad: kart.adSoyad,
+          telNo: kart.telNo,
+          markaModel: kart.markaModel,
+          plaka: kart.plaka,
+          km: kart.km,
+          modelYili: kart.modelYili,
+          sasi: kart.sasi,
+          renk: kart.renk,
+          girisTarihi: kart.girisTarihi,
+          notlar: kart.notlar,
+          adres: kart.adres,
+      },
+      data: kart.yapilanlar.map(item => ({
+          birimAdedi: item.birimAdedi,
+          parcaAdi: item.parcaAdi,
+          birimFiyati: item.birimFiyati,
+          toplamFiyat: item.birimFiyati * item.birimAdedi,
+      })),
+      notes: kart.notlar
+  };
+
+  try {
+      const response = await fetchWithAuth('https://16.171.130.205/excel/pdf', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataToSend)
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'output.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+  } catch (error) {
+      console.error('PDF download error:', error);
+  }
+  setLoading(false);
+};
+
+const secilenKartlariIndir = async (type) => {
   setLoading(true);
 
   if (secilenKartlar.length === 0) {
@@ -311,7 +371,11 @@ const secilenKartlariIndir = async () => {
 
   // Seçilen tüm kartları indir
   for (const kartId of secilenKartlar) {
-      await handleExcelDownload(kartId);
+      if (type === 'excel') {
+          await handleExcelDownload(kartId);
+      } else {
+          await handlePDFDownload(kartId);
+      }
   }
 
   setLoading(false);
@@ -394,7 +458,10 @@ const secilenKartlariIndir = async () => {
                     <button onClick={silSecilenleri} className="font-semibold text-my-beyaz text-md">Seçilenleri Sil</button>
                   </div>
                   <div className="items-center bg-green-500 p-2 pl-4 pr-4 rounded-full ml-4">
-                    <button onClick={secilenKartlariIndir} className="font-semibold text-my-beyaz text-md">Seçilenleri İndir</button>
+                    <button onClick={() => secilenKartlariIndir('excel')} className="font-semibold text-my-beyaz text-md">Seçilenleri Excel İndir</button>
+                  </div>
+                  <div className="items-center bg-orange-600 p-2 pl-4 pr-4 rounded-full ml-4">
+                    <button onClick={() => secilenKartlariIndir('pdf')} className="font-semibold text-my-beyaz text-md">Seçilenleri PDF İndir</button>
                   </div>
                 </div>
                 <div className="items-center bg-my-mavi p-2 pl-4 pr-4 rounded-full ml-4">
@@ -495,8 +562,17 @@ const secilenKartlariIndir = async () => {
                         <td className="px-6 py-4">
                           <Link href={DetailPage(kart.card_id)} className="bg-yellow-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-siyah hover:underline">Detay</Link>
                         </td>
-                        <td className="px-6 py-4">
-                          <button onClick={() => handleExcelDownload(kart.card_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">Excel</button>  
+                        <td className="px-6 py-4 flex gap-2">
+                          <button onClick={() => handleExcelDownload(kart.card_id)} className="bg-green-500 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                          </button>
+                          <button onClick={() => handlePDFDownload(kart.card_id)} className="bg-orange-600 p-2 pl-4 pr-4 rounded-full font-medium text-my-beyaz hover:underline">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -520,8 +596,8 @@ const secilenKartlariIndir = async () => {
                 {/* Action buttons stacked */}
                 <div className="flex flex-col gap-2 w-full mb-4">
                   <button onClick={silSecilenleri} className="w-full bg-red-600 text-white font-semibold py-2 rounded-full">Seçilenleri Sil</button>
-                  <button onClick={secilenKartlariIndir} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri İndir</button>
-                  <button onClick={toggleYeniKartEkleModal} className="w-full bg-my-mavi text-white font-semibold py-2 rounded-full">Yeni Kart Ekle</button>
+                  <button onClick={() => secilenKartlariIndir('excel')} className="w-full bg-green-500 text-white font-semibold py-2 rounded-full">Seçilenleri Excel İndir</button>
+                  <button onClick={() => secilenKartlariIndir('pdf')} className="w-full bg-blue-500 text-white font-semibold py-2 rounded-full">Seçilenleri PDF İndir</button>
                 </div>
                 {/* Card list, full width, white bg, compact */}
                 <div className="w-full bg-white">
@@ -554,11 +630,18 @@ const secilenKartlariIndir = async () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </Link>
-                        <button onClick={() => handleExcelDownload(kart.card_id)} className="text-green-500 hover:text-green-600">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        </button>
+                        <div className="flex gap-2">
+                          <button onClick={() => handleExcelDownload(kart.card_id)} className="text-green-500 hover:text-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                          </button>
+                          <button onClick={() => handlePDFDownload(kart.card_id)} className="text-orange-600 hover:text-orange-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

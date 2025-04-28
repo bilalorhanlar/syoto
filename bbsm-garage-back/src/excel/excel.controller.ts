@@ -12,21 +12,29 @@ export class ExcelController {
     @Res() res: Response,
   ) {
     try {
-      const { excelBuffer, pdfBuffer } = await this.excelService.generateExcel(data);
+      const excelBuffer = await this.excelService.generateExcel(data);
       
-      // Excel dosyasını indir
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', 'attachment; filename=output.xlsx');
       res.send(excelBuffer);
+    } catch (error) {
+      res.status(500).json({ message: 'Excel download failed', error: error.message });
+    }
+  }
 
-      // PDF dosyasını indir
+  @Post('pdf')
+  async downloadPDF(
+    @Body() data: any,
+    @Res() res: Response,
+  ) {
+    try {
+      const pdfBuffer = await this.excelService.generatePDF(data);
+      
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=output.pdf');
       res.send(pdfBuffer);
-
     } catch (error) {
-      console.error('Excel download error:', error);
-      res.status(500).json({ message: 'Excel download failed', error: error.message });
+      res.status(500).json({ message: 'PDF download failed', error: error.message });
     }
   }
 } 
