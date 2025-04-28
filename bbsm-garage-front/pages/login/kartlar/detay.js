@@ -254,6 +254,61 @@ export default function Detay() {
   const handleExcelDownload = async () => {
     setLoading(true);
     const dataToSend = {
+      vehicleInfo: {
+        adSoyad: adSoyad || '',
+        telNo: telNo || '',
+        markaModel: markaModel || '',
+        plaka: plaka || '',
+        km: km || '',
+        modelYili: modelYili || '',
+        sasi: sasi || '',
+        renk: renk || '',
+        girisTarihi: girisTarihi || '',
+        notlar: notlar || '',
+        adres: adres || '',
+      },
+      data: yapilanlar.map(item => ({
+        birimAdedi: parseInt(item.birimAdedi) || 0,
+        parcaAdi: item.parcaAdi || '',
+        birimFiyati: parseFloat(item.birimFiyati) || 0,
+        toplamFiyat: (parseFloat(item.birimFiyati) || 0) * (parseInt(item.birimAdedi) || 0),
+      })),
+      notes: notlar || ''
+    };
+
+    try {
+      const response = await fetch('https://16.171.130.205/excel/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'output.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Excel download error:', error);
+      // Show error message to user
+      alert('Excel dosyası indirilirken bir hata oluştu. Lütfen tekrar deneyin.');
+    }
+    setLoading(false);
+  };
+
+  const handlePDFDownload = async () => {
+    setLoading(true);
+    const dataToSend = {
         vehicleInfo: {
             adSoyad,
             telNo,
@@ -277,7 +332,7 @@ export default function Detay() {
     };
 
     try {
-        const response = await fetch('https://13.61.75.15/api/excel/download', {
+        const response = await fetch('https://16.171.130.205/excel/pdf', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -294,79 +349,14 @@ export default function Detay() {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'output.xlsx';
+        a.download = 'output.pdf';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
     } catch (error) {
-        console.error('Excel download error:', error);
-
-        // Hatanın detaylarını loglama
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('Request data:', error.request);
-        } else {
-            console.error('Error message:', error.message);
-        }
-        console.error('Error config:', error.config);
+        console.error('PDF download error:', error);
     }
     setLoading(false);
-};
-
-const handlePDFDownload = async () => {
-  setLoading(true);
-  const dataToSend = {
-      vehicleInfo: {
-          adSoyad,
-          telNo,
-          markaModel,
-          plaka,
-          km,
-          modelYili,
-          sasi,
-          renk,
-          girisTarihi,
-          notlar,
-          adres,
-      },
-      data: yapilanlar.map(item => ({
-          birimAdedi: item.birimAdedi,
-          parcaAdi: item.parcaAdi,
-          birimFiyati: item.birimFiyati,
-          toplamFiyat: item.birimFiyati * item.birimAdedi,
-      })),
-      notes: notlar
-  };
-
-  try {
-      const response = await fetch('https://13.61.75.15/api/pdf/download', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dataToSend),
-      });
-
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'output.pdf';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-  } catch (error) {
-      console.error('PDF download error:', error);
-  }
-  setLoading(false);
 };
 
   return (
