@@ -277,6 +277,8 @@ const Kartlar = () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(dataToSend),
+            mode: 'cors',
+            credentials: 'include'
         });
 
         if (!response.ok) {
