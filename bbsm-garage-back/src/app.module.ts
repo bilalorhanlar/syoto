@@ -12,6 +12,8 @@ import { CardModule } from './card/card.module';
 import { StokModule } from './stok/stok.module';
 import { TeklifModule } from './teklif/teklif.module';
 import { YapilanlarModule } from './yapilanlar/yapilanlar.module';
+import { ExcelModule } from './excel/excel.module';
+import { HttpModule } from '@nestjs/axios';
 
 let env = new EnvDto();
 
@@ -20,31 +22,29 @@ log(env);
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath: '.env',
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: env.DB_HOST,
-      port: parseInt(env.DB_PORT),
-      username: env.DB_USER,
-      password: env.DB_PASS,
-      database: env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      entities: [],
       synchronize: true,
-      ssl: env.DB_SSL,
-      extra: {
-        ssl: {
-          rejectUnauthorized: false
-        }
-      }
+      autoLoadEntities: true,
     }),
     AuthModule,
     CardModule,
     StokModule,
     TeklifModule,
     YapilanlarModule,
+    ExcelModule,
+    HttpModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

@@ -271,14 +271,12 @@ const Kartlar = () => {
     };
 
     try {
-        const response = await fetch('https://13.61.75.15/api/excel/download', {
+        const response = await fetchWithAuth('https://16.171.130.205/excel/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(dataToSend),
-            mode: 'cors',
-            credentials: 'include'
+            body: JSON.stringify(dataToSend)
         });
 
         if (!response.ok) {
