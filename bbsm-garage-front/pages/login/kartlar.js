@@ -271,7 +271,7 @@ const Kartlar = () => {
     };
 
     try {
-        const response = await fetch('https://13.61.75.15/api/excel/download', {
+        const response = await fetch('https://13.61.75.15:4020/api/excel/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -296,17 +296,7 @@ const Kartlar = () => {
         window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Excel download error:', error);
-
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('Request data:', error.request);
-        } else {
-            console.error('Error message:', error.message);
-        }
-        console.error('Error config:', error.config);
+        console.error('Error message:', error.message);
     }
     setLoading(false);
 };
