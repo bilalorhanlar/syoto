@@ -271,7 +271,7 @@ const Kartlar = () => {
     };
 
     try {
-        const response = await fetch('http://51.20.254.93:4020/api/excel/download', {
+        const response = await fetch('http://13.61.75.15:4020/api/excel/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

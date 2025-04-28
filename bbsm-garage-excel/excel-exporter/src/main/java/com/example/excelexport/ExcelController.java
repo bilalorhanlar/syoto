@@ -23,23 +23,54 @@ public class ExcelController {
     @Autowired
     private ExcelService excelService;
 
+    @Autowired
+    private PDFService pdfService;
+
     @PostMapping("/download")
     public ResponseEntity<InputStreamResource> downloadExcel(@RequestBody Map<String, Object> requestData) throws IOException {
-        logger.info("Excel indirme isteği alındı.");
+        logger.info("Excel ve PDF indirme isteği alındı.");
 
         Map<String, Object> vehicleInfo = (Map<String, Object>) requestData.get("vehicleInfo");
         List<Map<String, Object>> data = (List<Map<String, Object>>) requestData.get("data");
         String notes = (String) requestData.get("notes");
 
-        ByteArrayInputStream in = excelService.exportExcel(vehicleInfo, data, notes);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=output.xlsx");
+        // Önce Excel oluştur
+        ByteArrayInputStream excelIn = excelService.exportExcel(vehicleInfo, data, notes);
+        HttpHeaders excelHeaders = new HttpHeaders();
+        excelHeaders.add("Content-Disposition", "attachment; filename=syoto.xlsx");
 
-        logger.info("Excel dosyası indirme için hazırlandı.");
+        // Sonra PDF oluştur
+        ByteArrayInputStream pdfIn = pdfService.exportPDF(vehicleInfo, data, notes);
+        HttpHeaders pdfHeaders = new HttpHeaders();
+        pdfHeaders.add("Content-Disposition", "attachment; filename=syoto.pdf");
+
+        logger.info("Excel ve PDF dosyaları indirme için hazırlandı.");
+
+        // Önce Excel'i döndür
+        return ResponseEntity
+                .ok()
+                .headers(excelHeaders)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(excelIn));
+    }
+
+    @PostMapping("/download-pdf")
+    public ResponseEntity<InputStreamResource> downloadPDF(@RequestBody Map<String, Object> requestData) throws IOException {
+        logger.info("PDF indirme isteği alındı.");
+
+        Map<String, Object> vehicleInfo = (Map<String, Object>) requestData.get("vehicleInfo");
+        List<Map<String, Object>> data = (List<Map<String, Object>>) requestData.get("data");
+        String notes = (String) requestData.get("notes");
+
+        ByteArrayInputStream in = pdfService.exportPDF(vehicleInfo, data, notes);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=syoto.pdf");
+
+        logger.info("PDF dosyası indirme için hazırlandı.");
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(in));
     }
 }

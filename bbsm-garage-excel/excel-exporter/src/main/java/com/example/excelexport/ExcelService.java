@@ -21,7 +21,7 @@ public class ExcelService {
     private static final int MAX_ROWS_PER_SHEET = 24;
 
     public ByteArrayInputStream exportExcel(Map<String, Object> vehicleInfo, List<Map<String, Object>> data, String notes) throws IOException {
-        String templatePath = "/eses.xlsx";  // Şablon dosyasının yolu
+        String templatePath = "/syoto.xlsx";  // Şablon dosyasının yolu
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         logger.info("Excel şablonu okunuyor: {}", templatePath);
