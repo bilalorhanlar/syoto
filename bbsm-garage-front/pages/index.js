@@ -25,18 +25,22 @@ export default function Home() {
     setLoading(true);
     
     try {
+      console.log('Login attempt with:', { username: username.trim() });
+      
       const response = await fetch('https://16.171.130.205/auth/control', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ 
           username: username.trim(),
           password: password.trim()
         }),
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
       console.log('Login response:', data);
       
@@ -51,6 +55,8 @@ export default function Home() {
       console.error('Giriş hatası:', error);
       if (error.message.includes('Failed to fetch')) {
         alert('Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin.');
+      } else if (error.message.includes('NetworkError')) {
+        alert('Ağ bağlantısı hatası. Lütfen internet bağlantınızı kontrol edin.');
       } else {
         alert('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
       }
