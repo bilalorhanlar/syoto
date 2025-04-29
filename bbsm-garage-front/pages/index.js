@@ -69,7 +69,7 @@ export default function Home() {
       <Head>
         <title>BBSM Garage</title>
         <link rel="icon" href="/BBSM.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
       <div className="min-h-screen bg-my-home bg-cover bg-center bg-fixed">
         <div className="min-h-screen flex items-center justify-center p-4 sm:p-8">
@@ -81,22 +81,24 @@ export default function Home() {
               <div>
                 <p className="font-semibold text-my-beyaz">Kullanıcı Adı</p>
                 <input 
-                  className="w-full p-2 mt-1 rounded-xl border border-my-açıkgri bg-white/90" 
+                  className="w-full p-2 mt-1 rounded-xl border border-my-açıkgri bg-white/90 text-black" 
                   type="text" 
                   placeholder="Kullanıcı Adı" 
                   value={username} 
                   onChange={handleUsernameChange}
+                  required
                 />
               </div>
               
               <div>
                 <p className="font-semibold text-my-beyaz">Şifre</p>
                 <input 
-                  className="w-full p-2 mt-1 rounded-xl border border-my-açıkgri bg-white/90" 
+                  className="w-full p-2 mt-1 rounded-xl border border-my-açıkgri bg-white/90 text-black" 
                   type="password" 
                   placeholder="Şifre" 
                   value={password} 
                   onChange={handlePasswordChange}
+                  required
                 />
               </div>
             </div>
@@ -113,10 +115,17 @@ export default function Home() {
               <button 
                 type="submit" 
                 className="flex-1 p-2 font-semibold rounded-xl border-2 border-my-4b4b4bgri bg-my-siyah text-my-beyaz transition duration-500 ease-in-out hover:bg-my-4b4b4bgri"
+                disabled={loading}
               >
-                <p className="font-extrabold text-transparent text-sm sm:text-lg bg-clip-text bg-gradient-to-r from-blue-400 to-blue-900">
-                  Giriş Yap
-                </p>
+                {loading ? (
+                  <p className="font-extrabold text-transparent text-sm sm:text-lg bg-clip-text bg-gradient-to-r from-blue-400 to-blue-900">
+                    Giriş Yapılıyor...
+                  </p>
+                ) : (
+                  <p className="font-extrabold text-transparent text-sm sm:text-lg bg-clip-text bg-gradient-to-r from-blue-400 to-blue-900">
+                    Giriş Yap
+                  </p>
+                )}
               </button>
             </div>
           </form>

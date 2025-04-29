@@ -44,7 +44,7 @@ export class ExcelService {
       });
 
       const pdfResponse: AxiosResponse<ArrayBuffer> = await firstValueFrom(
-        this.httpService.post('https://13.61.75.15/api/pdf/download', data, {
+        this.httpService.post('https://13.61.75.15/api/excel/pdf', data, {
           responseType: 'arraybuffer',
           headers: {
             'Content-Type': 'application/json',
