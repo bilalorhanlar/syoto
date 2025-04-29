@@ -12,7 +12,7 @@ async function bootstrap() {
     allowedHeaders: '*',
     methods: '*',
     credentials : true,
-  });
+  });   
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(4000);
 }

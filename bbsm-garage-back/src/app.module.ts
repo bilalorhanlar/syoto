@@ -38,7 +38,12 @@ log(env);
       ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: true,
         ca: process.env.DB_SSL_CERT
-      } : false
+      } : false,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false
+        }
+      }
     }),
     AuthModule,
     CardModule,

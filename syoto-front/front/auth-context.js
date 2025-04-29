@@ -37,12 +37,16 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    const response = await fetch(url, {
+    // Development ortamında SSL doğrulamasını atla
+    const isDev = process.env.NODE_ENV === 'development';
+    const finalUrl = isDev ? url.replace('https://', 'http://') : url;
+
+    const response = await fetch(finalUrl, {
       ...options,
       headers: {
         ...options.headers,
         'Authorization': `Bearer ${token}`,
-      },
+      }
     });
 
     if (response.status === 401) {
