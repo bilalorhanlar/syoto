@@ -144,6 +144,25 @@ export default function stok() {
       setFilteredStokListesi(stokListesi.filter(stok => stok.stokAdi.toLowerCase().includes(term) || stok.info.toLowerCase().includes(term)));
     };
     
+    const handleAdetUpdate = async (id, operation) => {
+      setLoading(true);
+      try {
+        const response = await fetchWithAuth(`https://16.171.130.205/stok/${id}/adet/${operation}`, {
+          method: 'PATCH',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Adet güncellenirken bir hata oluştu');
+        }
+        
+        // Stok listesini yenile
+        fetchStokListesi();
+      } catch (error) {
+        console.error('Adet güncelleme hatası:', error);
+        alert('Adet güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      }
+      setLoading(false);
+    };
   
     return (
       <>
@@ -293,7 +312,22 @@ export default function stok() {
                           {new Date(stok.eklenisTarihi).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 text-green-500">
-                          {stok.adet}
+                          <div className="flex items-center space-x-2">
+                            <button 
+                              onClick={() => handleAdetUpdate(stok.id, 'decrement')}
+                              className="p-1 rounded-full bg-red-100 hover:bg-red-200 text-red-600"
+                              disabled={stok.adet <= 0}
+                            >
+                              -
+                            </button>
+                            <span>{stok.adet}</span>
+                            <button 
+                              onClick={() => handleAdetUpdate(stok.id, 'increment')}
+                              className="p-1 rounded-full bg-green-100 hover:bg-green-200 text-green-600"
+                            >
+                              +
+                            </button>
+                          </div>
                         </td>
                         <td className="px-6 py-4 uppercase">
                         <textarea
@@ -363,7 +397,22 @@ export default function stok() {
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-gray-900 text-sm truncate">{capitalizeWords(stok.stokAdi)}</div>
                     <div className="text-xs text-gray-600">{new Date(stok.eklenisTarihi).toLocaleDateString()}</div>
-                    <div className="text-xs text-green-600 font-semibold">Adet: {stok.adet}</div>
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={() => handleAdetUpdate(stok.id, 'decrement')}
+                        className="p-1 rounded-full bg-red-100 hover:bg-red-200 text-red-600"
+                        disabled={stok.adet <= 0}
+                      >
+                        -
+                      </button>
+                      <span className="text-green-600 font-semibold">{stok.adet}</span>
+                      <button 
+                        onClick={() => handleAdetUpdate(stok.id, 'increment')}
+                        className="p-1 rounded-full bg-green-100 hover:bg-green-200 text-green-600"
+                      >
+                        +
+                      </button>
+                    </div>
                     <div className="text-xs text-gray-600 truncate">{stok.info}</div>
                   </div>
                 </div>

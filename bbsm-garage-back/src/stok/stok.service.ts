@@ -38,5 +38,19 @@ export class StokService {
   remove(id: number) {
     return this.databaseRepository.delete({"id":id});
   }
-x
+
+  async updateAdet(id: number, operation: 'increment' | 'decrement') {
+    const stok = await this.databaseRepository.findOne({ where: { id } });
+    if (!stok) {
+      throw new Error('Stok bulunamadı');
+    }
+
+    if (operation === 'increment') {
+      stok.adet += 1;
+    } else if (operation === 'decrement' && stok.adet > 0) {
+      stok.adet -= 1;
+    }
+
+    return this.databaseRepository.save(stok);
+  }
 }

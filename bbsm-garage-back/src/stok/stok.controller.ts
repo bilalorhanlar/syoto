@@ -40,4 +40,8 @@ export class StokController {
     return this.stokService.remove(+id);
   }
 
+  @Patch(':id/adet/:operation')
+  updateAdet(@Param('id') id: string, @Param('operation') operation: 'increment' | 'decrement') {
+    return this.stokService.updateAdet(+id, operation);
+  }
 }
