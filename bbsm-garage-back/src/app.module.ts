@@ -35,9 +35,10 @@ log(env);
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: true,
+        ca: process.env.DB_SSL_CERT
+      } : false
     }),
     AuthModule,
     CardModule,
