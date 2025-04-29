@@ -17,7 +17,7 @@ public class CorsConfig {
                         .allowedOriginPatterns("*") // Tüm kaynaklardan gelen isteklere izin verir
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                         .allowedHeaders("*") // Tüm başlıklara izin verir
-                        .allowCredentials(true); // Kimlik bilgilerinin kullanılmasına izin verir
+                        .allowCredentials(false); // Kimlik bilgilerinin kullanılmasına izin verir
             }
         };
     }
