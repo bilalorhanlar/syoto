@@ -1,9 +1,8 @@
 import Link from "next/link"
 import Head from "next/head"
-import Script from 'next/script'
 import Header from '../components/header';
 import Footer from '../components/footer';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const mapContainerStyle = {
     width: '100%',
@@ -11,48 +10,130 @@ const mapContainerStyle = {
 };
 
 const center = {
-    lat: 41.1149455,  // Maslak, 8. Sokak koordinatları
-    lng: 29.0182724
-};
-
-const options = {
-    styles: [
-        {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "on" }]
-        }
-    ],
-    disableDefaultUI: false,
-    zoomControl: true,
-    mapTypeControl: true,
-    streetViewControl: true,
-    fullscreenControl: true,
-    mapTypeId: 'roadmap',
-    clickableIcons: true,
-    zoom: 18
+    lat: 41.114980,
+    lng: 29.018226
 };
 
 export default function bizeulasin() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [map, setMap] = useState(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const mapRef = useRef(null);
 
-    const onLoad = useCallback((map) => {
-        setMap(map);
-        // Haritayı merkeze odakla
-        map.setZoom(17);
-    }, []);
+    useEffect(() => {
+        // Leaflet CSS ve JS dosyalarını dinamik olarak yükle
+        const loadLeaflet = async () => {
+            if (typeof window === 'undefined' || mapLoaded) return;
 
-    const onUnmount = useCallback((map) => {
-        setMap(null);
-    }, []);
+            // CSS yükle
+            if (!document.querySelector('#leaflet-css')) {
+                const cssLink = document.createElement('link');
+                cssLink.id = 'leaflet-css';
+                cssLink.rel = 'stylesheet';
+                cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                cssLink.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+                cssLink.crossOrigin = '';
+                document.head.appendChild(cssLink);
+            }
 
-    const handleMarkerClick = () => {
-        setIsOpen(true);
-        if (map) {
-            map.panTo(center);
-            map.setZoom(18);
+            // JS yükle
+            if (!window.L) {
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+                script.crossOrigin = '';
+                script.onload = () => {
+                    initMap();
+                    setMapLoaded(true);
+                };
+                document.head.appendChild(script);
+            } else {
+                initMap();
+                setMapLoaded(true);
+            }
+        };
+
+        loadLeaflet();
+
+        // Cleanup function
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
+    }, []); // mapLoaded dependency'sini kaldırdık
+
+    const initMap = () => {
+        if (typeof window === 'undefined' || !window.L) return;
+
+        const mapElement = document.getElementById('map');
+        if (!mapElement) return;
+
+        // Eğer harita zaten başlatılmışsa, önce onu temizle
+        if (mapRef.current) {
+            mapRef.current.remove();
+            mapRef.current = null;
         }
+
+        // Haritayı temizle
+        mapElement.innerHTML = '';
+
+        // Yeni harita oluştur
+        const map = window.L.map('map').setView([center.lat, center.lng], 17);
+        mapRef.current = map;
+
+        // OpenStreetMap tile layer ekle
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Özel marker ikonu oluştur
+        const customIcon = window.L.divIcon({
+            className: 'custom-marker',
+            html: `
+                <div style="
+                    background: #dc2626;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 18px;
+                ">
+                    🚗
+                </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
+        });
+
+        // Marker ekle
+        const marker = window.L.marker([center.lat, center.lng], { icon: customIcon }).addTo(map);
+
+        // Popup içeriği
+        const popupContent = `
+            <div style="padding: 10px; max-width: 250px;">
+                <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">S&Y Otomotiv</h3>
+                <p style="color: #666; margin-bottom: 10px; font-size: 14px;">Atatürk Oto Sanayi Sitesi 2.Kısım, 8. Sokak No:254, 34000 Sarıyer/İstanbul</p>
+                <div style="margin-top: 10px;">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${center.lat},${center.lng}" 
+                       target="_blank" rel="noopener noreferrer" 
+                       style="color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 500;">
+                        📍 Google Maps'te Yol Tarifi Al
+                    </a>
+                </div>
+            </div>
+        `;
+
+        marker.bindPopup(popupContent);
+
+        // Popup'ı otomatik olarak aç
+        marker.openPopup();
     };
 
     return <>
@@ -60,11 +141,19 @@ export default function bizeulasin() {
         <Head>
             <title>S&Y Otomotiv - Bize Ulaşın</title>
             <link rel="icon" href="/syoto.ico" />
+            <style jsx global>{`
+                .custom-marker {
+                    background: transparent;
+                    border: none;
+                }
+                .leaflet-popup-content-wrapper {
+                    border-radius: 8px;
+                }
+                .leaflet-popup-content {
+                    margin: 0;
+                }
+            `}</style>
         </Head>
-        <Script
-            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
-            strategy="lazyOnload"
-        />
         
         {/* Hero Section */}
         <div className="relative h-[70vh]">
@@ -92,109 +181,6 @@ export default function bizeulasin() {
                         >
                             Randevu Al
                         </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {/* Map Section */}
-        <div className="w-full py-12 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="mb-12 text-center">
-                    <h2 className="text-3xl font-bold mb-4">Bizi Ziyaret Edin</h2>
-                    <p className="text-gray-600">Maslak'taki servisimize kolayca ulaşabilirsiniz</p>
-                </div>
-                <div className="rounded-lg over shadow-lg">
-                    {/* Google Maps bileşeni client-side'da yüklenecek */}
-                    <div id="map" style={mapContainerStyle}></div>
-                    <Script id="google-maps-script" strategy="afterInteractive">
-                        {`
-                            function initMap() {
-                                const map = new google.maps.Map(document.getElementById('map'), {
-                                    center: { lat: ${center.lat}, lng: ${center.lng} },
-                                    zoom: 17,
-                                    styles: ${JSON.stringify(options.styles)},
-                                    disableDefaultUI: ${options.disableDefaultUI},
-                                    zoomControl: ${options.zoomControl},
-                                    mapTypeControl: ${options.mapTypeControl},
-                                    streetViewControl: ${options.streetViewControl},
-                                    fullscreenControl: ${options.fullscreenControl},
-                                    mapTypeId: '${options.mapTypeId}',
-                                    clickableIcons: ${options.clickableIcons}
-                                });
-                                
-                                const marker = new google.maps.Marker({
-                                    position: { lat: ${center.lat}, lng: ${center.lng} },
-                                    map: map,
-                                    icon: {
-                                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                                        scaledSize: new google.maps.Size(40, 40),
-                                        zIndex: 999
-                                    }
-                                });
-                                
-                                const infoWindow = new google.maps.InfoWindow({
-                                    content: \`
-                                        <div class="p-2">
-                                            <h3 class="font-bold text-lg mb-1">S&Y Otomotiv</h3>
-                                            <p class="text-gray-600 mb-2">Atatürk Oto Sanayi Sitesi 2.Kısım, 8. Sokak No:254, 34000 Sarıyer/İstanbul</p>
-                                            <div class="flex gap-2">
-                                                <a href="https://www.google.com/maps/dir/?api=1&destination=${center.lat},${center.lng}" 
-                                                   target="_blank" rel="noopener noreferrer" 
-                                                   class="text-blue-600 hover:text-blue-800 text-sm">
-                                                    Yol Tarifi Al
-                                                </a>
-                                            </div>
-                                        </div>
-                                    \`
-                                });
-                                
-                                marker.addListener('click', () => {
-                                    infoWindow.open(map, marker);
-                                });
-                            }
-                            
-                            // Google Maps API yüklendiğinde haritayı başlat
-                            if (typeof google !== 'undefined') {
-                                initMap();
-                            } else {
-                                // API henüz yüklenmediyse, yüklendiğinde haritayı başlat
-                                window.initMap = initMap;
-                            }
-                        `}
-                    </Script>
-                </div>
-                
-                {/* Yol Tarifi Kartları */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="text-red-600 mb-4">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-lg mb-2">Toplu Taşıma</h3>
-                        <p className="text-gray-600">Metro ile Atatürk Oto Sanayi durağında inin, 5 dakikalık yürüme mesafesindeyiz.</p>
-                    </div>
-                    
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="text-red-600 mb-4">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-lg mb-2">Otopark</h3>
-                        <p className="text-gray-600">Misafirlerimiz için ücretsiz otoparkımız mevcuttur.</p>
-                    </div>
-                    
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="text-red-600 mb-4">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <h3 className="font-bold text-lg mb-2">Çalışma Saatleri</h3>
-                        <p className="text-gray-600">Hafta içi: 08:30-19:00<br/>Cumartesi: 09:30-17:00</p>
                     </div>
                 </div>
             </div>
@@ -233,13 +219,13 @@ export default function bizeulasin() {
                                 </svg>
                                 <div>
                                     <h3 className="font-semibold">E-posta</h3>
-                                    <a href="mailto:info@syotomotiv.com" className="text-gray-600 hover:text-red-600">maslaksyotomotiv@gmail.com</a>
+                                    <a href="mailto:maslaksyotomotiv@gmail.com" className="text-gray-600 hover:text-red-600">maslaksyotomotiv@gmail.com</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">Çalışma Saatleri</h2>
+                        <h2 className="text-2xl font-bold mb-4">Çalışma Saatları</h2>
                         <div className="space-y-2">
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Pazartesi</span>
@@ -274,7 +260,7 @@ export default function bizeulasin() {
                 </div>
 
                 {/* Contact Form */}
-                <div className="bg-white p-8 rounded-lg shadow-lg">
+                <div id="contact-form" className="bg-white p-8 rounded-lg shadow-lg">
                     <h2 className="text-2xl font-bold mb-6">Randevu Formu</h2>
                     <form className="space-y-4">
                         <div>
@@ -333,6 +319,61 @@ export default function bizeulasin() {
                             Randevu Al
                         </button>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        {/* Yol Tarifi Kartları */}
+        <div className="w-full py-12 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="mb-12 text-center">
+                    <h2 className="text-3xl font-bold mb-4">Ulaşım Bilgileri</h2>
+                    <p className="text-gray-600">Servisimize nasıl ulaşabileceğiniz hakkında bilgiler</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="text-red-600 mb-4">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-lg mb-2">Toplu Taşıma</h3>
+                        <p className="text-gray-600">Metro ile Atatürk Oto Sanayi durağında inin, 5 dakikalık yürüme mesafesindeyiz.</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="text-red-600 mb-4">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-lg mb-2">Otopark</h3>
+                        <p className="text-gray-600">Misafirlerimiz için ücretsiz otoparkımız mevcuttur.</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="text-red-600 mb-4">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 className="font-bold text-lg mb-2">Çalışma Saatları</h3>
+                        <p className="text-gray-600">Hafta içi: 08:30-19:00<br/>Cumartesi: 09:30-17:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Map Section */}
+        <div className="w-full py-12 bg-white">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="mb-12 text-center">
+                    <h2 className="text-3xl font-bold mb-4">Bizi Ziyaret Edin</h2>
+                    <p className="text-gray-600">Maslak'taki servisimize kolayca ulaşabilirsiniz</p>
+                </div>
+                <div className="rounded-lg overflow-hidden shadow-lg">
+                    {/* OpenStreetMap Container */}
+                    <div id="map" style={mapContainerStyle}></div>
                 </div>
             </div>
         </div>
