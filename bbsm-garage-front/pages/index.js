@@ -27,7 +27,7 @@ export default function Home() {
     try {
       console.log('Login attempt with:', { username: username.trim() });
       
-      const response = await fetch('https://16.171.130.205/auth/control', {
+      const response = await fetch('https://syoto-garage.up.railway.app/auth/control', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

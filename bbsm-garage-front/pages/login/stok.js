@@ -43,7 +43,7 @@ export default function stok() {
     const fetchStokListesi = async () => {
       setLoading(true);
       try {
-          const response = await fetchWithAuth("https://16.171.130.205/stok", {
+          const response = await fetchWithAuth("https://syoto-garage.up.railway.app/stok", {
               method: 'GET',
           });
           if (!response.ok) {
@@ -75,7 +75,7 @@ export default function stok() {
           };
 
           try {
-              const response = await fetchWithAuth('https://16.171.130.205/stok', {
+              const response = await fetchWithAuth('https://syoto-garage.up.railway.app/stok', {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export default function stok() {
       try {
         // Seçilen her bir stok ID'si için ayrı bir DELETE isteği gönder
         const deleteRequests = selectedStok.map(id =>
-          fetchWithAuth(`https://16.171.130.205/stok/${id}`, { method: 'DELETE' })
+          fetchWithAuth(`https://syoto-garage.up.railway.app/stok/${id}`, { method: 'DELETE' })
         );
         await Promise.all(deleteRequests);
     
@@ -147,7 +147,7 @@ export default function stok() {
     const handleAdetUpdate = async (id, operation) => {
       setLoading(true);
       try {
-        const response = await fetchWithAuth(`https://16.171.130.205/stok/${id}/adet/${operation}`, {
+        const response = await fetchWithAuth(`https://syoto-garage.up.railway.app/stok/${id}/adet/${operation}`, {
           method: 'PATCH',
         });
         

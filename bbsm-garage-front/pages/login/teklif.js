@@ -34,7 +34,7 @@ export default function Teklif() {
   const fetchTeklifListesi = async () => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth("https://16.171.130.205/teklif", {
+      const response = await fetchWithAuth("https://syoto-garage.up.railway.app/teklif", {
         method: 'GET',
         redirect: 'follow'
       });
@@ -64,7 +64,7 @@ export default function Teklif() {
     setLoading(true);
     try {
       const deleteRequests = secilenTeklifler.map(teklifId =>
-        fetchWithAuth(`https://16.171.130.205/teklif/${teklifId}`, { method: 'DELETE' })
+        fetchWithAuth(`https://syoto-garage.up.railway.app/teklif/${teklifId}`, { method: 'DELETE' })
       );
       await Promise.all(deleteRequests);
 
@@ -98,7 +98,7 @@ export default function Teklif() {
     console.log("teklif ekle teklif");
     try {
       const [deleteResponse] = await Promise.all([
-        fetchWithAuth(`https://16.171.130.205/teklif/${teklif.teklif_id}`, {
+        fetchWithAuth(`https://syoto-garage.up.railway.app/teklif/${teklif.teklif_id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function Teklif() {
       {
           console.log("delete teklif");
           const [postResponse] = await Promise.all([
-            fetchWithAuth('https://16.171.130.205/card', {
+            fetchWithAuth('https://syoto-garage.up.railway.app/card', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ export default function Teklif() {
     };
 
     try {
-        const response = await fetchWithAuth('https://16.171.130.205/excel/download', {
+        const response = await fetchWithAuth('https://syoto-garage.up.railway.app/excel/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ const handlePDFDownload = async (teklifId) => {
   };
 
   try {
-      const response = await fetchWithAuth('https://16.171.130.205/excel/pdf', {
+      const response = await fetchWithAuth('https://syoto-garage.up.railway.app/excel/pdf', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

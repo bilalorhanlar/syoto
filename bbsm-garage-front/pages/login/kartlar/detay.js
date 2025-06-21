@@ -71,7 +71,7 @@ export default function Detay() {
   async function fetchData(card_id) {
     setLoading(true);
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205/card/${card_id}/yapilanlar`, {
+      const response = await fetchWithAuth(`https://syoto-garage.up.railway.app/card/${card_id}/yapilanlar`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export default function Detay() {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205/yapilanlar/${id}`, {
+      const response = await fetchWithAuth(`https://syoto-garage.up.railway.app/yapilanlar/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ export default function Detay() {
     };
 
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205/card/${detay_id}`, {
+      const response = await fetchWithAuth(`https://syoto-garage.up.railway.app/card/${detay_id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ export default function Detay() {
     }));
 
     try {
-      const response = await fetchWithAuth(`https://16.171.130.205/card/${detay_id}/yapilanlar`, {
+      const response = await fetchWithAuth(`https://syoto-garage.up.railway.app/card/${detay_id}/yapilanlar`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -277,7 +277,7 @@ export default function Detay() {
     };
 
     try {
-      const response = await fetch('https://16.171.130.205/excel/download', {
+      const response = await fetch('https://syoto-garage.up.railway.app/excel/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -332,7 +332,7 @@ export default function Detay() {
     };
 
     try {
-        const response = await fetch('https://16.171.130.205/excel/pdf', {
+        const response = await fetch('https://syoto-garage.up.railway.app/excel/pdf', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ const ProtectedComponent = () => {
 
   useEffect(() => {
     const fetchProtectedData = async () => {
-      const response = await fetchWithAuth('https://16.171.130.205/protected');
+      const response = await fetchWithAuth('https://syoto-garage.up.railway.app/protected');
 
       if (response.ok) {
         const data = await response.json();
